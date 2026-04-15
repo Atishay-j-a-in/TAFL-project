@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CFG <-> PDA Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    
+    <link rel="stylesheet" href="styles.css" />
+    
+   
+  </head>
+  <body>
+    <div class="bg-shape shape-a"></div>
+    <div class="bg-shape shape-b"></div>
+    <div class="bg-shape shape-c"></div>
+
+    <section id="introPage" class="intro-shell reveal">
+      <header class="hero card">
+        <p class="badge">Theory of Automata and Formal Languages</p>
+        <h1>CFG and PDA <span class="accent">Equivalence</span> Explorer</h1>
+        <p>
+          Context-Free Grammars and Pushdown Automata define exactly the same class of languages:
+          context-free languages. This page introduces the core theory before you open the
+          converter.
+        </p>
+      </header>
+
+      <main class="intro-layout">
+        <section class="card intro-card">
+          <h2>Detailed Theory Primer</h2>
+          <p>
+            In formal language theory, a language can be described either by a generator or by a
+            recognizer. For context-free languages (CFLs), the generator is a Context-Free Grammar
+            (CFG) and the recognizer is a Pushdown Automaton (PDA). This is one of the most
+            important equivalence results in automata theory.
+          </p>
+
+          <div class="formula-box">
+            <p><strong>CFG:</strong> G = (V, Sigma, R, S)</p>
+            <p><strong>PDA:</strong> M = (Q, Sigma, Gamma, delta, q0, Z0, F)</p>
+            <p><strong>Equivalence:</strong> L(G) = L(M) for every CFL.</p>
+          </div>
+
+          <div class="intro-split-grid">
+            <article class="mini-card">
+              <h3>What CFGs Do</h3>
+              <p>
+                CFGs build strings by repeatedly replacing variables using production rules. A
+                derivation starts from S and ends when only terminals remain.
+              </p>
+              <ul>
+                <li>Great for expressing recursive syntax.</li>
+                <li>Common in parser design and programming language grammars.</li>
+                <li>Naturally represented as parse trees.</li>
+              </ul>
+            </article>
+
+            <article class="mini-card">
+              <h3>What PDAs Do</h3>
+              <p>
+                PDAs read input symbols while using a stack for extra memory. The stack enables
+                matching nested or balanced patterns that finite automata cannot handle.
+              </p>
+              <ul>
+                <li>Can push symbols to remember open structure.</li>
+                <li>Can pop symbols to verify matched structure.</li>
+                <li>Accepts by final state in this project.</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3>CFG vs PDA at a Glance</h3>
+          <div class="intro-table-wrap">
+            <table class="intro-table">
+              <thead>
+                <tr>
+                  <th>Aspect</th>
+                  <th>CFG</th>
+                  <th>PDA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Main View</td>
+                  <td>Generative (productions)</td>
+                  <td>Operational (state + stack moves)</td>
+                </tr>
+                <tr>
+                  <td>Memory</td>
+                  <td>Implicit via recursion</td>
+                  <td>Explicit stack (Gamma)</td>
+                </tr>
+                <tr>
+                  <td>Typical Output</td>
+                  <td>Derivation / parse tree</td>
+                  <td>Run trace / configurations</td>
+                </tr>
+                <tr>
+                  <td>Use Cases</td>
+                  <td>Syntax specification</td>
+                  <td>Language recognition</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card intro-card">
+          <h2>How This Converter Builds Equivalence</h2>
+          <div class="intro-split-grid">
+            <article class="mini-card">
+              <h3>CFG -> PDA Construction</h3>
+              <ol>
+                <li>Start with bottom marker on stack.</li>
+                <li>Push grammar start symbol S.</li>
+                <li>For each production A -> alpha, add epsilon transition replacing A by alpha.</li>
+                <li>For each terminal a, read a and pop a.</li>
+                <li>Accept when input is consumed and bottom marker remains.</li>
+              </ol>
+            </article>
+
+            <article class="mini-card">
+              <h3>PDA -> CFG Construction</h3>
+              <ol>
+                <li>Create variables [p,X,q] for states p,q and stack symbol X.</li>
+                <li>Interpret [p,X,q] as all strings taking PDA from p to q while popping X.</li>
+                <li>Translate transitions into grammar productions over these variables.</li>
+                <li>Add start productions from PDA start to accept states.</li>
+                <li>Simplify by removing duplicate, non-generating, and unreachable rules.</li>
+              </ol>
+            </article>
+          </div>
+
+          <p class="dense-note">
+            Note: The app demonstrates standard educational constructions. It prioritizes
+            readability and traceability over heavy optimization.
+          </p>
+        </section>
+
+        <section class="card intro-card">
+          <h2>Worked Language Example</h2>
+          <p>
+            Consider L = { a^n b^n | n >= 0 }. A classic CFG is S -> aSb | epsilon. In a PDA view,
+            each a pushes a marker and each b pops one marker. Acceptance occurs when input ends and
+            the stack returns to the bottom marker.
+          </p>
+          <div class="formula-box">
+            <p>Valid strings: epsilon, ab, aabb, aaabbb</p>
+            <p>Invalid strings: aab, abb, aaabb</p>
+            <p>Why invalid: stack depth and remaining input do not match.</p>
+          </div>
+        </section>
+
+        <section class="card intro-card">
+          <h2>Concept Diagrams</h2>
+          <div class="intro-diagram-wrap">
+            <h3>Grammar Expansion Idea</h3>
+            <svg viewBox="0 0 820 180" role="img" aria-label="CFG derivation diagram">
+              <defs>
+                <marker id="introArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <polygon points="0 0, 8 4, 0 8" fill="#111"></polygon>
+                </marker>
+              </defs>
+              <rect x="22" y="50" width="100" height="46" rx="10" fill="#fff" stroke="#111" stroke-width="3"></rect>
+              <text x="72" y="79" text-anchor="middle" font-size="20" font-family="Space Mono">S</text>
+              <path d="M 128 73 L 230 73" stroke="#111" stroke-width="3" fill="none" marker-end="url(#introArrow)"></path>
+              <rect x="240" y="50" width="200" height="46" rx="10" fill="#fff" stroke="#111" stroke-width="3"></rect>
+              <text x="340" y="79" text-anchor="middle" font-size="20" font-family="Space Mono">a S b</text>
+              <path d="M 446 73 L 548 73" stroke="#111" stroke-width="3" fill="none" marker-end="url(#introArrow)"></path>
+              <rect x="558" y="50" width="240" height="46" rx="10" fill="#fff" stroke="#111" stroke-width="3"></rect>
+              <text x="678" y="79" text-anchor="middle" font-size="20" font-family="Space Mono">a a S b b</text>
+              <text x="24" y="132" font-size="14" font-family="Space Mono">Apply production repeatedly until only terminals remain.</text>
+            </svg>
+          </div>
+
+          <div class="intro-diagram-wrap">
+            <h3>PDA Stack Behavior</h3>
+            <svg viewBox="0 0 820 220" role="img" aria-label="PDA stack behavior diagram">
+              <rect x="24" y="28" width="230" height="168" rx="12" fill="#fff" stroke="#111" stroke-width="3"></rect>
+              <text x="38" y="54" font-size="16" font-family="Space Mono">Input: a a b b</text>
+              <text x="38" y="84" font-size="14" font-family="Space Mono">Read a: push A</text>
+              <text x="38" y="108" font-size="14" font-family="Space Mono">Read a: push A</text>
+              <text x="38" y="132" font-size="14" font-family="Space Mono">Read b: pop A</text>
+              <text x="38" y="156" font-size="14" font-family="Space Mono">Read b: pop A</text>
+
+              <rect x="340" y="28" width="120" height="168" rx="10" fill="#fff" stroke="#111" stroke-width="3"></rect>
+              <rect x="362" y="52" width="76" height="28" rx="8" fill="#fff0a2" stroke="#111" stroke-width="2"></rect>
+              <text x="400" y="72" text-anchor="middle" font-size="16" font-family="Space Mono">A</text>
+              <rect x="362" y="84" width="76" height="28" rx="8" fill="#fff0a2" stroke="#111" stroke-width="2"></rect>
+              <text x="400" y="104" text-anchor="middle" font-size="16" font-family="Space Mono">A</text>
+              <rect x="362" y="116" width="76" height="28" rx="8" fill="#fff0a2" stroke="#111" stroke-width="2"></rect>
+              <text x="400" y="136" text-anchor="middle" font-size="16" font-family="Space Mono">$</text>
+
+              <path d="M 466 112 L 620 112" stroke="#111" stroke-width="3" fill="none" marker-end="url(#introArrow)"></path>
+              <rect x="640" y="48" width="156" height="128" rx="12" fill="#d4ffe5" stroke="#111" stroke-width="3"></rect>
+              <text x="718" y="90" text-anchor="middle" font-size="18" font-family="Space Mono">Accept</text>
+              <text x="718" y="118" text-anchor="middle" font-size="14" font-family="Space Mono">Input consumed</text>
+              <text x="718" y="140" text-anchor="middle" font-size="14" font-family="Space Mono">Stack back to $</text>
+            </svg>
+          </div>
+        </section>
+
+        <section class="card intro-card">
+          <h2>Assumptions and Scope</h2>
+          <ul>
+            <li>This interface is designed for teaching conversions, not parser production code.</li>
+            <li>The current CFG parser is intentionally lightweight for classroom-style examples.</li>
+            <li>Large PDA inputs can create many CFG variables during conversion.</li>
+            <li>Diagram legends and stack traces are included so each transition remains explainable.</li>
+          </ul>
+        </section>
+
+        <section class="card intro-card intro-cta">
+          <h2>Ready To Convert?</h2>
+          <p>
+            Open the interactive converter to input your grammar or PDA, view the equivalent model,
+            and inspect step-by-step stack simulation.
+          </p>
+          <button id="startConversionBtn" class="start-btn">Start Conversion Lab</button>
+        </section>
+      </main>
+    </section>
+
+    <div id="converterApp" class="app-hidden">
+
+    <header class="hero card reveal">
+      <p class="badge">Theory of Computation Lab</p>
+      <h1>CFG <span class="accent">Equivalent</span> PDA Converter</h1>
+      <p>
+        Explore how Context-Free Grammars and Pushdown Automata represent the same language
+        families. Enter a model, convert it, and inspect each formal step.
+      </p>
+    </header>
+
+    <main class="layout-single">
+      <div class="mode-switch card reveal">
+        <button id="showCfgModeBtn" class="mode-btn active">CFG -> PDA</button>
+        <button id="showPdaModeBtn" class="mode-btn">PDA -> CFG</button>
+      </div>
+
+      <section id="cfgMode" class="panel card reveal conversion-view active-view">
+        <h2>CFG -> PDA</h2>
+        <p class="subtext">
+          Input a grammar and generate a standard 3-state PDA construction.
+        </p>
+
+        <label for="cfgStart">Start Symbol</label>
+        <input id="cfgStart" value="S" />
+
+        <label for="cfgInput">Productions (one per line)</label>
+        <textarea id="cfgInput" spellcheck="false">S -> aSb | T
+T -> cT | epsilon</textarea>
+
+        <button id="convertCfgBtn">Convert CFG to PDA</button>
+
+        <div id="cfgError" class="error"></div>
+
+        <h3>Step-by-step conversion</h3>
+        <ol id="cfgSteps" class="steps"></ol>
+
+        <h3>PDA Transitions</h3>
+        <div id="cfgToPdaTransitions" class="table-wrap"></div>
+
+        <h3>PDA Diagram</h3>
+        <p class="diagram-note">
+          CFG -> PDA uses the standard 3-state construction. The state layout stays similar; transition
+          rules and legend content change with your grammar.
+        </p>
+        <div id="cfgToPdaDiagram" class="diagram"></div>
+
+        <h3>PDA Stack Simulation</h3>
+        <label for="cfgSimInput">Input String for PDA Run</label>
+        <input id="cfgSimInput" value="aacbb" />
+        <button id="runCfgPdaSimBtn">Simulate CFG-derived PDA</button>
+        <div id="cfgSimResult" class="subtext sim-result"></div>
+        <div id="cfgStackViz" class="stack-viz"></div>
+      </section>
+
+      <section id="pdaMode" class="panel card reveal delay-1 conversion-view">
+        <h2>PDA -> CFG</h2>
+        <p class="subtext">
+          Input a PDA as JSON and construct the equivalent CFG using variables of form
+          [p,X,q].
+        </p>
+
+        <label for="pdaInput">PDA JSON</label>
+        <textarea id="pdaInput" spellcheck="false">{
+  "states": ["q0", "q1", "qf"],
+  "inputAlphabet": ["a", "b"],
+  "stackAlphabet": ["Z", "S", "a", "b"],
+  "startState": "q0",
+  "startStack": "Z",
+  "acceptStates": ["qf"],
+  "transitions": [
+    { "from": "q0", "input": "epsilon", "pop": "epsilon", "to": "q1", "push": ["S", "Z"] },
+    { "from": "q1", "input": "epsilon", "pop": "S", "to": "q1", "push": ["a", "S", "b"] },
+    { "from": "q1", "input": "epsilon", "pop": "S", "to": "q1", "push": [] },
+    { "from": "q1", "input": "a", "pop": "a", "to": "q1", "push": [] },
+    { "from": "q1", "input": "b", "pop": "b", "to": "q1", "push": [] },
+    { "from": "q1", "input": "epsilon", "pop": "Z", "to": "qf", "push": [] }
+  ]
+}</textarea>
+
+        <h3>Interactive PDA Editor</h3>
+        <div class="editor-grid">
+          <input id="editorStateName" placeholder="State name (e.g., q2)" />
+          <label class="inline-check"><input id="editorStateAccept" type="checkbox" /> Accept state</label>
+          <label class="inline-check"><input id="editorStateStart" type="checkbox" /> Start state</label>
+          <button id="editorAddStateBtn">Add/Update State</button>
+        </div>
+        <div class="editor-grid transitions-grid">
+          <select id="editorFromState"></select>
+          <input id="editorInputSymbol" placeholder="Input (a or epsilon)" value="epsilon" />
+          <input id="editorPopSymbol" placeholder="Pop symbol" value="epsilon" />
+          <select id="editorToState"></select>
+          <input id="editorPushSymbols" placeholder="Push symbols comma-separated" value="S,Z" />
+          <button id="editorAddTransitionBtn">Add Transition</button>
+        </div>
+        <div class="btn-row">
+          <button id="loadJsonToEditorBtn">Load JSON -> Editor</button>
+          <button id="syncEditorToJsonBtn">Sync Editor -> JSON</button>
+        </div>
+        <div id="pdaEditorGraph" class="diagram"></div>
+
+        <button id="convertPdaBtn">Convert PDA to CFG</button>
+
+        <div id="pdaError" class="error"></div>
+
+        <h3>Step-by-step conversion</h3>
+        <ol id="pdaSteps" class="steps"></ol>
+
+        <h3>Generated CFG</h3>
+        <pre id="pdaToCfgOutput" class="output"></pre>
+
+        <h3>Simplification Summary</h3>
+        <pre id="pdaSimplifyInfo" class="output"></pre>
+
+        <h3>Model Visuals</h3>
+        <div id="pdaDiagram" class="diagram"></div>
+        <div id="cfgDiagram" class="diagram"></div>
+
+        <h3>PDA Stack Simulation</h3>
+        <label for="pdaSimInput">Input String for PDA Run</label>
+        <input id="pdaSimInput" value="aabb" />
+        <button id="runPdaSimBtn">Simulate Entered PDA</button>
+        <div id="pdaSimResult" class="subtext sim-result"></div>
+        <div id="pdaStackViz" class="stack-viz"></div>
+      </section>
+    </main>
+
+    <div class="converter-back-wrap">
+      <button id="backToIntroBtn" class="secondary-btn">Back To Theory Intro</button>
+    </div>
+
+    
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
